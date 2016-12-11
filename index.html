@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Dynamic-Cubemaps : Upload of dynamic cubemapping graphics project">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Dynamic-Cubemaps</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/khongton/Dynamic-Cubemaps">View on GitHub</a>
+
+          <h1 id="project_title">Dynamic-Cubemaps</h1>
+          <h2 id="project_tagline">Upload of dynamic cubemapping graphics project</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/khongton/Dynamic-Cubemaps/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/khongton/Dynamic-Cubemaps/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h3>
+
+<p>For my final project in Introduction to Graphics (CPE471) during Spring 2016, I decided to implement a dynamic cubemap. The primary goal for the project was to render a relatively realistic looking scene. This program renders a reflective or refractive sphere in the middle of the scene, simulating the effects of light based on the sphere's current shading model.</p>
+
+<p>The program makes use of the following computer graphics techniques:</p>
+
+<ul>
+<li>Environment Mapping</li>
+<li>Skyboxing</li>
+<li>Reflection</li>
+<li>Refraction</li>
+<li>Blinn-Phone Shading</li>
+</ul>
+
+<p>Program Controls</p>
+
+<ul>
+<li>Mouse Click + Drag: Rotate Camera</li>
+<li>Shift + Mouse Drag: Pan Camera</li>
+<li>Ctrl + Mouse Drag: Zoom Camera</li>
+<li>'q': Enable/Disable dynamic cubemap</li>
+<li>'r': Toggle between reflective and refractive surface.</li>
+</ul>
+
+<p>The finished program looked something like this. The GIF quality is a bit poor, so please keep that in mind. The after images that appear on the sphere below do not show up in the actual program.</p>
+
+<h3>
+<a id="environment-mapping" class="anchor" href="#environment-mapping" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Environment Mapping</h3>
+
+<p>Environment mapping is an image-based lighting technique where we can approximate the appearance of a reflective or refractive surface using a texture image. In the case of a 3D world, this can be done using a type of texture called a <strong>cubemap.</strong></p>
+
+<h2>
+<a id="what-are-cubemaps" class="anchor" href="#what-are-cubemaps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are cubemaps?</h2>
+
+<p>A cubemap is essentially a box made out of six 2D textures, which can be provided to the program or generated at run-time. A cubemap made out of provided textures are called <strong>static cubemaps</strong>, whereas textures provided during run-time are called <strong>dynamic cubemaps</strong>. </p>
+
+<p>After providing a cubemap to the program, the fragment shader computes a normalized direction vector from the origin of the object, and the first fragment color it finds is used to color the object's fragment. The image below illustrates this concept.</p>
+
+<p><img src="https://learnopengl.com/img/advanced/cubemaps_sampling.png" alt="Cubemap Example"></p>
+
+<h2>
+<a id="creating-a-static-cubemap" class="anchor" href="#creating-a-static-cubemap" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating a static cubemap</h2>
+
+<p>In OpenGL, there is an enum called <code>GL_TEXTURE_CUBE_MAP</code>. When binded to a newly generated texture, this informs OpenGL that we're going to create a cubemap. We assign the images to each side of the cubemap using the <code>GL_TEXTURE_CUBE_MAP_POSITIVE_X</code> enum, where positive x is the image on the "right" face of the cube, as shown in the following picture. We can get the other sides of the face by incrementing <code>GL_TEXTURE_CUBE_MAP_POSITIVE_X</code>.</p>
+
+<p><img src="https://learnopengl.com/img/advanced/cubemaps_skybox.png" alt="Cube Map Faces"></p>
+
+<p>For a static cubemap, this is very easy to implement. We simply supply six images into our program, and then load the textures once before rendering. During each rendering call, we pass the cubemap texture into our fragment shader and let it do the heavy lifting for us. In GLSL, we can specify a cubemap texture with the following uniform: <code>uniform samplerCube.</code> We can then determine the color of our object's fragment by calling <code>textureCube(cubemap, directionVector).</code> This calculates the normalize direction vector and determines our color, as explained previously.</p>
+
+<h2>
+<a id="generating-a-dynamic-cubemap" class="anchor" href="#generating-a-dynamic-cubemap" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Generating a dynamic cubemap</h2>
+
+<p>Creating a static cubemap can create beautiful, stationary scenes, but it needs to be remembered that a dynamic cubemap is one that works with the surrounding environment in real-time. So, we simply cannot load the images into our program to display a moving environment on our reflective or refractive surface. This would take way too much memory and we could not possibly account for all possibilities of a dynamic environment. </p>
+
+<p>The solution to this is to generate the cubemap faces at run-time. This is accomplished by rendering our scene six times before a final render pass, once for each face on the cube. By setting the camera along each positive and negative axis and setting the field of view (FOV) to 90 degrees, we essentially capture what the face sees. We render these images into a framebuffer object, which allows us to generate textures from those images. </p>
+
+<p>Once we've rendered the six textures in each direction successfully, we can combine them into a cubemap texture and then sample them in the final pass of our fragment shader, which generates a relatively realistic looking reflective or refractive sphere.</p>
+
+<h3>
+<a id="skybox" class="anchor" href="#skybox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Skybox</h3>
+
+<p>Skyboxes are a common application of cubemapping. They allow us to create realistic 3D environments with low performance cost, which can greatly enhance the sense of realism through the illusion of making the surrounding environment much larger than it actually is. If we drop the smoke and mirrors of skyboxing, then essentially this is what our skybox looks like.</p>
+
+<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/skybox_concept.jpg" alt="Skybox"></p>
+
+<p>From the camera's perspective, the resulting effect can be very compelling.</p>
+
+<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/skybox_example.jpg" alt="Skybox Example"></p>
+
+<p>In my program, the skybox can be seen in the background and reflected off this sphere.</p>
+
+<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/final_skybox.jpg" alt="Skybox reflected"></p>
+
+<h2>
+<a id="motivation-for-using-a-skybox" class="anchor" href="#motivation-for-using-a-skybox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation for using a Skybox</h2>
+
+<p>My primary goal for the final project was to render a relatively realistic looking scene. After many minutes of Googling and searching through Stackoverflow threads, one of most common suggestions to enhance realism was to use a skybox. The results are visually impressive, and the ability to render something this impressive for a low performance cost made it clear that this would going into my project.</p>
+
+<h3>
+<a id="reflection" class="anchor" href="#reflection" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reflection</h3>
+
+<p>In layman's terms, reflection can be defined as the way light bounces off a surface. The shinier the surface, the more reflective it is. The basic concept behind the physics is shown below. In GLSL, there is a function called <code>reflect</code> that does all the calculations for us. By feeding the computed reflection vector into the <code>textureCube</code> function, we can simulate a reflective surface by using this vector to sample from our cubemap.</p>
+
+<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/reflection.jpg" alt="Reflection"></p>
+
+<p>In my program, the surface of the sphere reflects the light coming off the environment. In this bunny example, due to the various normals of the object, we get multiple reflections on the surface, despite there only being three spheres in the scene. </p>
+
+<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/bunny_reflection.jpg" alt="Bunny Reflect"></p>
+
+<h2>
+<a id="motivation-for-using-reflection" class="anchor" href="#motivation-for-using-reflection" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation for using Reflection</h2>
+
+<p>When thinking about how to render a realistic scene, I thought of many ways, but most of them involved extremely detailed 3D models and/or specific techniques such as shadow mapping or bump mapping. This proved to be too difficult to complete in a span of two weeks. Rendering a reflective surface was the most straightforward way to make it seem realistic, since we would expect a shiny surface to reflect the environment around it in real life!</p>
+
+<h3>
+<a id="refraction" class="anchor" href="#refraction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Refraction</h3>
+
+<p>The counterpart to reflection is refraction. In layman's terms, this is defined as the change in direction of a light ray after it passes through some substance. The amount light bends depends on how "fast" the substances are. The physics behind the calculation of these substance speeds can be found by Googling further information on refraction. In GLSL, just like <code>reflect</code>, there is a <code>refract</code> function that computes all the math for us. The resulting vector can be used in our `textureCube1 function to create a refractive object. The follow image illustrates how refraction works.</p>
+
+<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/refraction_example.jpg" alt="Refraction"></p>
+
+<p>In my program, we can simulate a glass-like object by switching our fragment shaders to the refractive one. This refraction model also includes a little bit of reflection. As one of the spheres moves behind the teapot, we see that it looks warped just like the straw in the above image. </p>
+
+<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/teapot_refraction.jpg" alt="Teapot Refract"></p>
+
+<h2>
+<a id="motivation-for-using-refraction" class="anchor" href="#motivation-for-using-refraction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation for using Refraction</h2>
+
+<p>Only having a reflective surface felt very limited in what I could realistically render. Reflection and refraction are both related, so it made sense to naturally include it as an optional shading model when writing my program. Additionally, it was another way to further prove that my program could render scenes realistically.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Dynamic-Cubemaps maintained by <a href="https://github.com/khongton">khongton</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
