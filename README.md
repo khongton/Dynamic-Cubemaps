@@ -2,4 +2,6 @@
 
 This is a graphics application I wrote as a final for my graphics class in Spring 2016. It's a standalone demo of a dynamic cubemap, and features reflection, refraction, and skyboxing. 
 
-[View the project website](https://khongton.github.io/Dynamic-Cubemaps/) to see the graphics techniques that were used in the making of this project.
+[View the Website I created for this project](http://users.csc.calpoly.edu/~ssueda/teaching/CSC471/2016S/demos/khongton/index.html) to learn more about the project in depth.
+
+[View the alternative github.io website](https://khongton.github.io/Dynamic-Cubemaps/) in case the link above becomes broken. The content is exactly the same!
