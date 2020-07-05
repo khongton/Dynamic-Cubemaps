@@ -57,7 +57,7 @@
 </ul>
 
 <p>The finished program looked something like this. The GIF quality is a bit poor, so please keep that in mind. The after images that appear on the sphere below do not show up in the actual program.</p>
-<p><img src="http://users.csc.calpoly.edu/~ssueda/teaching/CSC471/2016S/demos/khongton/images/teapot.gif" alt="Cubemap"></p> 
+<p><img src="media/teapot.gif" alt="Cubemap"></p> 
 
 <h3>
 <a id="environment-mapping" class="anchor" href="#environment-mapping" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Environment Mapping</h3>
@@ -96,15 +96,15 @@
 
 <p>Skyboxes are a common application of cubemapping. They allow us to create realistic 3D environments with low performance cost, which can greatly enhance the sense of realism through the illusion of making the surrounding environment much larger than it actually is. If we drop the smoke and mirrors of skyboxing, then essentially this is what our skybox looks like.</p>
 
-<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/skybox_concept.jpg" alt="Skybox"></p>
+<p><img src="media/skybox_concept.jpg" alt="Skybox"></p>
 
 <p>From the camera's perspective, the resulting effect can be very compelling.</p>
 
-<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/skybox_example.jpg" alt="Skybox Example"></p>
+<p><img src="media/skybox_example.jpg" alt="Skybox Example"></p>
 
 <p>In my program, the skybox can be seen in the background and reflected off this sphere.</p>
 
-<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/final_skybox.jpg" alt="Skybox reflected"></p>
+<p><img src="media/final_skybox.jpg" alt="Skybox reflected"></p>
 
 <h2>
 <a id="motivation-for-using-a-skybox" class="anchor" href="#motivation-for-using-a-skybox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation for using a Skybox</h2>
@@ -116,11 +116,11 @@
 
 <p>In layman's terms, reflection can be defined as the way light bounces off a surface. The shinier the surface, the more reflective it is. The basic concept behind the physics is shown below. In GLSL, there is a function called <code>reflect</code> that does all the calculations for us. By feeding the computed reflection vector into the <code>textureCube</code> function, we can simulate a reflective surface by using this vector to sample from our cubemap.</p>
 
-<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/reflection.jpg" alt="Reflection"></p>
+<p><img src="media/reflection.jpg" alt="Reflection"></p>
 
 <p>In my program, the surface of the sphere reflects the light coming off the environment. In this bunny example, due to the various normals of the object, we get multiple reflections on the surface, despite there only being three spheres in the scene. </p>
 
-<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/bunny_reflection.jpg" alt="Bunny Reflect"></p>
+<p><img src="media/bunny_reflection.jpg" alt="Bunny Reflect"></p>
 
 <h2>
 <a id="motivation-for-using-reflection" class="anchor" href="#motivation-for-using-reflection" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation for using Reflection</h2>
@@ -132,11 +132,11 @@
 
 <p>The counterpart to reflection is refraction. In layman's terms, this is defined as the change in direction of a light ray after it passes through some substance. The amount light bends depends on how "fast" the substances are. The physics behind the calculation of these substance speeds can be found by Googling further information on refraction. In GLSL, just like <code>reflect</code>, there is a <code>refract</code> function that computes all the math for us. The resulting vector can be used in our `textureCube1 function to create a refractive object. The follow image illustrates how refraction works.</p>
 
-<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/refraction_example.jpg" alt="Refraction"></p>
+<p><img src="media/refraction_example.jpg" alt="Refraction"></p>
 
 <p>In my program, we can simulate a glass-like object by switching our fragment shaders to the refractive one. This refraction model also includes a little bit of reflection. As one of the spheres moves behind the teapot, we see that it looks warped just like the straw in the above image. </p>
 
-<p><img src="http://users.csc.calpoly.edu/%7Essueda/teaching/CSC471/2016S/demos/khongton/images/teapot_refraction.jpg" alt="Teapot Refract"></p>
+<p><img src="media/teapot_refraction.jpg" alt="Teapot Refract"></p>
 
 <h2>
 <a id="motivation-for-using-refraction" class="anchor" href="#motivation-for-using-refraction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation for using Refraction</h2>
